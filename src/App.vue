@@ -1,12 +1,20 @@
 <template>
   <div id="app">
     <TitleComponent />
+
+    <button @click="GetStockInfo()">Get Stocks Info</button>
+    &nbsp;
+    <button @click="GetExchangeInfo()">Get Exchange Info</button>
+    &nbsp;
     <button @click="StartRealtimeData()">Start Connection</button>
     &nbsp;
     <button @click="StopRealtimeData()">Stop Connection</button>
     &nbsp;
     <button @click="Restart()">Restart</button>
-
+    &nbsp;
+    <span v-html="stocks_info"></span>
+    <span v-html="exchange_info"></span>
+    
     <line-chart :width="300" :height="100" :chart-data="datacollection" id="mychart"></line-chart>  
 
    
@@ -16,6 +24,8 @@
 <script>
 import LineChart from "./LineChart.js";
 import TitleComponent from './components/TitleComponent';
+
+
 import io from 'socket.io-client';
 
 var socket = io('wss://le-18262636.bitzonte.com', {path: '/stocks'});  
@@ -59,7 +69,9 @@ export default {
   },
   data(){
     return {
-      datacollection: {}
+      datacollection: {},
+      stocks_info: "nada",
+      exchange_info: "nada"
     };
   },
   methods: {
@@ -69,6 +81,20 @@ export default {
         labels: lbls_array,
         datasets: stocks_datasets
       }
+    },
+
+    GetExchangeInfo() {
+      socket.emit('EXCHANGES', /* */);
+      socket.on("EXCHANGES", (data)=>{
+        this.exchange_info = data;
+      })
+    },
+
+    GetStockInfo() {
+      socket.emit('STOCKS', /* */);
+      socket.on("STOCKS", (data)=>{
+        this.stocks_info = data;
+      })
     },
 
     StartRealtimeData() {  
