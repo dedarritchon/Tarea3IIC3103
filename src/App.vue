@@ -1,22 +1,24 @@
 <template>
   <div id="app">
     <TitleComponent />
-
-    <button @click="GetStockInfo()">Get Stocks Info</button>
     &nbsp;
-    <button @click="GetExchangeInfo()">Get Exchange Info</button>
+    <b-button v-bind:variant="ButtonStyle" @click="ToggleRealtimeData()">{{Action}}</b-button>
     &nbsp;
-    <button @click="StartRealtimeData()">Start Connection</button>
+    <b-button @click="Refresh()">Refresh</b-button>
     &nbsp;
-    <button @click="StopRealtimeData()">Stop Connection</button>
-    &nbsp;
-    <button @click="Restart()">Restart</button>
-    &nbsp;
-    <span v-html="stocks_info"></span>
-    <span v-html="exchange_info"></span>
+    <line-chart :height="80" :chart-data="datacollection" id="mychart"></line-chart>
+    <h1>Current Stocks:</h1>
+    <div v-for="(stock, index) in stocks_info" :key="index">
+      <h3 style="text-align:left;float:left;">{{stock.company_name}} ({{stock.ticker}})</h3> 
+      <a style="text-align:left">{{stock.quote_base}}</a> 
+      <hr style="clear:both;"/>
+    </div>
     
-    <line-chart :width="300" :height="100" :chart-data="datacollection" id="mychart"></line-chart>  
-
+    <h1>Exchanges:</h1>
+    <div v-for="(exch, index) in exchange_info" :key="index">
+      <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
+      <a>{{exch.country}}, ({{exch.address}})</a>
+    </div>
    
   </div>
 </template>
@@ -36,6 +38,7 @@ var stocks_values_dict = {};
 
 var stocks_datasets = [];
 
+
 function getRandomColor() {
   var letters = '0123456789ABCDEF';
   var color = '#';
@@ -44,22 +47,6 @@ function getRandomColor() {
   }
   return color;
 }
-
-
-/* 
-
-stocks_dict = {}
-stocks_dict["FB"] = [1, 2 , 3]
-
-Dataset = [] con cosas de este estilo
-{
-  label: 'FB',
-  backgroundColor: 'green',
-  data: [1, 2, 3]
-}
-
-*/
-
 
 export default {
   name: 'App',
@@ -70,8 +57,11 @@ export default {
   data(){
     return {
       datacollection: {},
-      stocks_info: "nada",
-      exchange_info: "nada"
+      stocks_info: [],
+      exchange_info: [],
+      myToggle: false,
+      Action: "Start",
+      ButtonStyle: "outline-primary"
     };
   },
   methods: {
@@ -97,51 +87,70 @@ export default {
       })
     },
 
-    StartRealtimeData() {  
+    SocketUpdate(data){
+      //this.fillData(fetchedData)
+      console.log("Update:\t", data);
+      var date = new Date(data.time).toLocaleString("es-CL")
+      //reviso si deberia agregarlo a la lista o ya está:
+
+      if(!lbls_array.length){
+        //empty
+          lbls_array.push(date)
+      }else{
+        //not empty
+        if (lbls_array[lbls_array.length - 1] != date){
+          lbls_array.push(date)
+        }
+      }
+
+      if (!(data.ticker in stocks_values_dict)){
+        //creo nueva lista de valores para nuevo stock
+        var values = [data.value];
+        stocks_values_dict[data.ticker] = values;
+
+        var color = getRandomColor();
+
+        //creamos el dataset para nuevo stock
+        var dataset = {};
+        dataset["label"] = data.ticker;
+        dataset["data"] = stocks_values_dict[data.ticker];
+        dataset["backgroundColor"] = color;
+        dataset["borderColor"] = color;
+        dataset["fill"] = false;
+
+        //agregamos el dataset del nuevo stock a la lista de datasets
+        stocks_datasets.push(dataset);
+      }
+      else{
+        //solo agregamos el dato al dataset del stock
+        stocks_values_dict[data.ticker].push(data.value);
+      }
+
+      this.fillData(lbls_array, stocks_datasets);
+    },
+
+    StartRealtimeData(){
       socket.on("UPDATE", (data)=>{
-        //this.fillData(fetchedData)
-        console.log("Update:\t", data);
-        var date = new Date(data.time).toLocaleString("es-CL")
-        //reviso si deberia agregarlo a la lista o ya está:
-
-        if(!lbls_array.length){
-          //empty
-           lbls_array.push(date)
-        }else{
-          //not empty
-          if (lbls_array[lbls_array.length - 1] != date){
-            lbls_array.push(date)
-          }
-        }
-
-        
-        
-
-        if (!(data.ticker in stocks_values_dict)){
-          //creo nueva lista de valores para nuevo stock
-          var values = [data.value];
-          stocks_values_dict[data.ticker] = values;
-
-          var color = getRandomColor();
-
-          //creamos el dataset para nuevo stock
-          var dataset = {};
-          dataset["label"] = data.ticker;
-          dataset["data"] = stocks_values_dict[data.ticker];
-          dataset["backgroundColor"] = color;
-          dataset["borderColor"] = color;
-          dataset["fill"] = false;
-
-          //agregamos el dataset del nuevo stock a la lista de datasets
-          stocks_datasets.push(dataset);
-        }
-        else{
-          //solo agregamos el dato al dataset del stock
-          stocks_values_dict[data.ticker].push(data.value);
-        }
-
-        this.fillData(lbls_array, stocks_datasets);
+        this.SocketUpdate(data);
       });
+    },
+
+    ToggleRealtimeData() {  
+
+      if (this.Action == "Start"){
+        //Variables Setup
+        this.Action = "Stop"
+        this.ButtonStyle = "danger"
+        this.GetStockInfo();
+        this.GetExchangeInfo();
+        this.StartRealtimeData();
+
+      }
+      else{
+        this.Action = "Start"
+        this.ButtonStyle = "outline-primary"
+        this.StopRealtimeData()
+      }
     },
 
     StopRealtimeData() {  
@@ -149,17 +158,27 @@ export default {
       console.log(stocks_values_dict);
     },
 
-    Restart() {
-      lbls_array = [];
-      stocks_datasets = [];
-      stocks_values_dict = {};
-      this.fillData(lbls_array, stocks_datasets);
+    Refresh() {
+      if (this.Action == "Start"){
+        lbls_array = [];
+        stocks_datasets = [];
+        stocks_values_dict = {};
+        this.exchange_info = [];
+        this.stocks_info = [];
+
+        this.fillData(lbls_array, stocks_datasets);
+      }
+      else{
+        lbls_array = [];
+        stocks_datasets = [];
+        stocks_values_dict = {};
+        this.fillData(lbls_array, stocks_datasets);
+      }
     },
 
     getRandomInt () {
       return Math.floor(Math.random() * (50 - 5 + 1)) + 5
-    }
-
+    },
   }
 };
 </script>
