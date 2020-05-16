@@ -1,31 +1,105 @@
 <template>
   <div id="app">
-    <TitleComponent />
-    &nbsp;
-    <b-button v-bind:variant="ButtonStyle" @click="ToggleRealtimeData()">{{Action}}</b-button>
-    &nbsp;
-    <b-button @click="Refresh()">Refresh</b-button>
-    &nbsp;
-    <line-chart :height="80" :chart-data="datacollection" id="mychart"></line-chart>
-    <h1>Current Stocks:</h1>
-    <div v-for="(stock, index) in stocks_info" :key="index">
-      <h3 style="text-align:left;float:left;">{{stock.company_name}} ({{stock.ticker}})</h3> 
-      <a style="text-align:left">{{stock.quote_base}}</a> 
-      <hr style="clear:both;"/>
+    <div>
+      <b-navbar toggleable="lg" type="dark" variant="dark">
+        <b-navbar-brand href="#">Tarea 3 IIC3103</b-navbar-brand>
+        <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+        <b-collapse id="nav-collapse" is-nav>
+          <b-navbar-nav>
+            <b-nav-item>
+              <b-button v-bind:variant="ButtonStyle" @click="ToggleRealtimeData()"> <b-icon icon="power"></b-icon> {{Action}}</b-button>
+            </b-nav-item>
+            <b-nav-item>
+              <b-button @click="Refresh()"> <b-icon icon="arrow-clockwise"></b-icon> Refresh</b-button>
+            </b-nav-item>
+          </b-navbar-nav>
+          <div class="mx-auto">
+            <h2 class='text-light' >Welcome to IIC3103 Exchange <b-icon icon="graph-up"></b-icon> </h2>
+          </div>
+          <!-- Right aligned nav items -->
+          <b-navbar-nav class="ml-auto">
+            <b-nav-form>
+              <b-form-input size="sm" class="mr-sm-2" placeholder="Search Stock"></b-form-input>
+              <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+            </b-nav-form>
+          </b-navbar-nav>
+        </b-collapse>
+      </b-navbar>
     </div>
-    
-    <h1>Exchanges:</h1>
-    <div v-for="(exch, index) in exchange_info" :key="index">
-      <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
-      <a>{{exch.country}}, ({{exch.address}})</a>
-    </div>
-   
+
+    <br>
+
+    <b-container fluid>
+      <b-row class="px-3">
+        <b-col class="border border-dark" cols="9">
+          <h2>Exchanges:</h2>   
+            <div v-for="(exch, index) in exchange_info" :key="index" class="px-2">
+              <b-row>
+              <b-col class="border border-dark" cols="9">
+                <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
+                <a>{{exch.country}}, ({{exch.address}})</a>
+                <line-chart :height="200" :chart-data="datacollection" id="mychart"></line-chart>
+                <br>
+              </b-col>
+              <b-col class="border border-dark" cols="3">
+                <h3>Indicadores</h3>
+                 <b-list-group>
+                  <b-list-group-item>
+                    Indicador 1
+                  </b-list-group-item>
+                  <hr style="clear:both;"/>
+                  <b-list-group-item>
+                    Indicador 2
+                  </b-list-group-item>
+                  <hr style="clear:both;"/>
+                  <b-list-group-item>
+                    Indicador 3
+                  </b-list-group-item>
+                </b-list-group>
+                {{exch}}
+              </b-col>
+              </b-row>
+              <hr style="clear:both;"/>
+            </div>
+        </b-col>
+        <b-col class="border border-dark">
+          <h2>Current Stocks:</h2>
+          <div v-for="(stock, index) in stocks_info" :key="index">
+
+            <b-card body-class="text-center" header-tag="nav">
+              <template v-slot:header>
+                <b-nav card-header tabs>
+                  <b-nav-item active>Info</b-nav-item>
+                  <b-nav-item>Gráfico</b-nav-item>
+                  <b-nav-item>Indicadores</b-nav-item>
+                </b-nav>
+              </template>
+
+              <b-card-text>
+                
+                <b-avatar variant="primary" class="mr-3" size="4em">{{stock.ticker}}</b-avatar>
+                <h3>{{stock.company_name}}</h3>
+                <strong>País: {{stock.country}} </strong>
+                <br>
+                <strong>Moneda: {{stock.quote_base}} </strong>
+              </b-card-text>
+
+            </b-card>
+            <br>     
+          </div>
+        </b-col>
+      </b-row>
+    </b-container>
+
+    <!-- Footer -->
+
+    <!-- Footer -->
+
   </div>
 </template>
 
 <script>
 import LineChart from "./LineChart.js";
-import TitleComponent from './components/TitleComponent';
 
 
 import io from 'socket.io-client';
@@ -51,7 +125,6 @@ function getRandomColor() {
 export default {
   name: 'App',
   components: {
-    TitleComponent,
     LineChart
   },
   data(){
@@ -66,6 +139,18 @@ export default {
   },
   methods: {
 
+    onClick(value) {
+      this.$bvModal.msgBoxOk('User name: Fred Flintstone', {
+        title: value,
+        size: 'sm',
+        buttonSize: 'sm',
+        okVariant: 'success',
+        headerClass: 'p-2 border-bottom-0',
+        footerClass: 'p-2 border-top-0'
+      })
+    },
+
+
     fillData (lbls_array, stocks_datasets) {
       this.datacollection = {
         labels: lbls_array,
@@ -75,14 +160,14 @@ export default {
 
     GetExchangeInfo() {
       socket.emit('EXCHANGES', /* */);
-      socket.on("EXCHANGES", (data)=>{
+      socket.once("EXCHANGES", (data)=>{
         this.exchange_info = data;
       })
     },
 
     GetStockInfo() {
       socket.emit('STOCKS', /* */);
-      socket.on("STOCKS", (data)=>{
+      socket.once("STOCKS", (data)=>{
         this.stocks_info = data;
       })
     },
@@ -90,7 +175,7 @@ export default {
     SocketUpdate(data){
       //this.fillData(fetchedData)
       console.log("Update:\t", data);
-      var date = new Date(data.time).toLocaleString("es-CL")
+      var date = new Date(data.time).toLocaleTimeString("es-CL")
       //reviso si deberia agregarlo a la lista o ya está:
 
       if(!lbls_array.length){
@@ -160,20 +245,19 @@ export default {
 
     Refresh() {
       if (this.Action == "Start"){
-        lbls_array = [];
-        stocks_datasets = [];
-        stocks_values_dict = {};
         this.exchange_info = [];
         this.stocks_info = [];
-
-        this.fillData(lbls_array, stocks_datasets);
       }
-      else{
-        lbls_array = [];
-        stocks_datasets = [];
-        stocks_values_dict = {};
-        this.fillData(lbls_array, stocks_datasets);
+      this.exchange_info = [];
+      this.stocks_info = [];
+      lbls_array = [];
+      stocks_datasets = [];
+      stocks_values_dict = {};
+      if (this.Action == "Stop"){
+        this.GetStockInfo();
+        this.GetExchangeInfo();
       }
+      this.fillData(lbls_array, stocks_datasets);
     },
 
     getRandomInt () {
@@ -212,4 +296,5 @@ export default {
       width: 600px;
       overflow-x: scroll;
   }
+
 </style>
