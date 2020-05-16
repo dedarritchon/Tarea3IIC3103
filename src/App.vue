@@ -10,7 +10,9 @@
               <b-button v-bind:variant="ButtonStyle" @click="ToggleRealtimeData()"> <b-icon icon="power"></b-icon> {{Action}}</b-button>
             </b-nav-item>
             <b-nav-item>
-              <b-button @click="Refresh()"> <b-icon icon="arrow-clockwise"></b-icon> Refresh</b-button>
+              <div v-if="stocks_info.length != 0">
+                <b-button @click="Refresh()"> <b-icon icon="arrow-clockwise"></b-icon> Refresh</b-button>
+              </div>
             </b-nav-item>
           </b-navbar-nav>
           <div class="mx-auto">
@@ -30,65 +32,93 @@
     <br>
 
     <b-container fluid>
-      <b-row class="px-3">
-        <b-col class="border border-dark" cols="9">
-          <h2>Exchanges:</h2>   
-            <div v-for="(exch, index) in exchange_info" :key="index" class="px-2">
-              <b-row>
-              <b-col class="border border-dark" cols="9">
-                <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
-                <a>{{exch.country}}, ({{exch.address}})</a>
-                <line-chart :height="200" :chart-data="datacollection" id="mychart"></line-chart>
-                <br>
-              </b-col>
-              <b-col class="border border-dark" cols="3">
-                <h3>Indicadores</h3>
-                 <b-list-group>
-                  <b-list-group-item>
-                    Indicador 1
-                  </b-list-group-item>
-                  <hr style="clear:both;"/>
-                  <b-list-group-item>
-                    Indicador 2
-                  </b-list-group-item>
-                  <hr style="clear:both;"/>
-                  <b-list-group-item>
-                    Indicador 3
-                  </b-list-group-item>
-                </b-list-group>
-                {{exch}}
-              </b-col>
-              </b-row>
-              <hr style="clear:both;"/>
+      <div v-if="stocks_info.length == 0">
+        <div>
+          <b-jumbotron>
+            <template v-slot:header>Bienvenido!</template>
+
+            <template v-slot:lead>
+              Aquí podrás consultar información de distintas bolsas de valores y acciones en tiempo real.
+            </template>
+
+            <hr class="my-4">
+
+            <p>
+              Actualmente estás desconectado
+            </p>
+
+            <b-button v-b-modal.modal-1>Ayuda</b-button>
+
+            <b-modal id="modal-1" title="IIC3103 Exchange">
+              <p class="my-4">
+                Hola! Para conectarte, pulsa el botón Start. <br>
+                Una vez conectado, puedes actualizar la información con el botón Refresh.
+               </p> 
+            </b-modal>
+          </b-jumbotron>
+        </div>
+      </div>
+      <div v-else>
+        <b-row class="px-3">
+          <b-col class="border border-dark" cols="9">
+            <h2>Exchanges:</h2>   
+              <div v-for="(exch, index) in exchange_info" :key="index" class="px-2">
+                <b-row>
+                <b-col class="border border-dark" cols="9">
+                  <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
+                  <a>{{exch.country}}, ({{exch.address}})</a>
+                  <line-chart :height="200" :chart-data="datacollection" id="mychart"></line-chart>
+                  <br>
+                </b-col>
+                <b-col class="border border-dark" cols="3">
+                  <h3>Indicadores</h3>
+                  <b-list-group>
+                    <b-list-group-item>
+                      Indicador 1
+                    </b-list-group-item>
+                    <hr style="clear:both;"/>
+                    <b-list-group-item>
+                      Indicador 2
+                    </b-list-group-item>
+                    <hr style="clear:both;"/>
+                    <b-list-group-item>
+                      Indicador 3
+                    </b-list-group-item>
+                  </b-list-group>
+                  {{exch}}
+                </b-col>
+                </b-row>
+                <hr style="clear:both;"/>
+              </div>
+          </b-col>
+          <b-col class="border border-dark">
+            <h2>Current Stocks:</h2>
+            <div v-for="(stock, index) in stocks_info" :key="index">
+
+              <b-card body-class="text-center" header-tag="nav">
+                <template v-slot:header>
+                  <b-nav card-header tabs>
+                    <b-nav-item active>Info</b-nav-item>
+                    <b-nav-item>Gráfico</b-nav-item>
+                    <b-nav-item>Indicadores</b-nav-item>
+                  </b-nav>
+                </template>
+
+                <b-card-text>
+                  
+                  <b-avatar variant="primary" class="mr-3" size="4em">{{stock.ticker}}</b-avatar>
+                  <h3>{{stock.company_name}}</h3>
+                  <strong>País: {{stock.country}} </strong>
+                  <br>
+                  <strong>Moneda: {{stock.quote_base}} </strong>
+                </b-card-text>
+
+              </b-card>
+              <br>     
             </div>
-        </b-col>
-        <b-col class="border border-dark">
-          <h2>Current Stocks:</h2>
-          <div v-for="(stock, index) in stocks_info" :key="index">
-
-            <b-card body-class="text-center" header-tag="nav">
-              <template v-slot:header>
-                <b-nav card-header tabs>
-                  <b-nav-item active>Info</b-nav-item>
-                  <b-nav-item>Gráfico</b-nav-item>
-                  <b-nav-item>Indicadores</b-nav-item>
-                </b-nav>
-              </template>
-
-              <b-card-text>
-                
-                <b-avatar variant="primary" class="mr-3" size="4em">{{stock.ticker}}</b-avatar>
-                <h3>{{stock.company_name}}</h3>
-                <strong>País: {{stock.country}} </strong>
-                <br>
-                <strong>Moneda: {{stock.quote_base}} </strong>
-              </b-card-text>
-
-            </b-card>
-            <br>     
-          </div>
-        </b-col>
-      </b-row>
+          </b-col>
+        </b-row>
+      </div>
     </b-container>
 
     <!-- Footer -->
@@ -139,9 +169,20 @@ export default {
   },
   methods: {
 
-    onClick(value) {
+    onClickHelp() {
       this.$bvModal.msgBoxOk('User name: Fred Flintstone', {
-        title: value,
+        title: "Hola",
+        size: 'sm',
+        buttonSize: 'sm',
+        okVariant: 'success',
+        headerClass: 'p-2 border-bottom-0',
+        footerClass: 'p-2 border-top-0'
+      })
+    },
+
+    onClick() {
+      this.$bvModal.msgBoxOk('User name: Fred Flintstone', {
+        title: "Hola",
         size: 'sm',
         buttonSize: 'sm',
         okVariant: 'success',
@@ -248,8 +289,6 @@ export default {
         this.exchange_info = [];
         this.stocks_info = [];
       }
-      this.exchange_info = [];
-      this.stocks_info = [];
       lbls_array = [];
       stocks_datasets = [];
       stocks_values_dict = {};
