@@ -16,13 +16,20 @@
             </b-nav-item>
           </b-navbar-nav>
           <div class="mx-auto">
-            <h2 class='text-light' >Welcome to IIC3103 Exchange <b-icon icon="graph-up"></b-icon> </h2>
+            <h3 class='text-light' >Welcome to IIC3103 Exchange <b-icon icon="graph-up"></b-icon> </h3>
+          </div>
+          <div class="mx-auto">
+            <h5 class='text-light' >{{ fecha_hora_actual }}</h5>
           </div>
           <!-- Right aligned nav items -->
           <b-navbar-nav class="ml-auto">
             <b-nav-form>
               <b-form-input size="sm" class="mr-sm-2" placeholder="Search Stock"></b-form-input>
-              <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+              <b-button size="sm" v-b-modal.modal-2>Buscar</b-button>
+
+              <b-modal id="modal-2" title="IIC3103 Exchange">
+                <b-img src="https://i.ytimg.com/vi/Wo9Y03EmvHY/maxresdefault.jpg" fluid alt="Responsive image"></b-img>
+              </b-modal>
             </b-nav-form>
           </b-navbar-nav>
         </b-collapse>
@@ -159,6 +166,7 @@ export default {
   },
   data(){
     return {
+      fecha_hora_actual: "Desconectado",
       datacollection: {},
       stocks_info: [],
       exchange_info: [],
@@ -216,6 +224,7 @@ export default {
     SocketUpdate(data){
       //this.fillData(fetchedData)
       console.log("Update:\t", data);
+      this.fecha_hora_actual = new Date(data.time).toLocaleString("es-CL")
       var date = new Date(data.time).toLocaleTimeString("es-CL")
       //reviso si deberia agregarlo a la lista o ya está:
 
@@ -288,6 +297,7 @@ export default {
       if (this.Action == "Start"){
         this.exchange_info = [];
         this.stocks_info = [];
+        this.fecha_hora_actual =  "Desconectado"
       }
       lbls_array = [];
       stocks_datasets = [];
