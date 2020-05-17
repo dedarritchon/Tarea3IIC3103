@@ -43,6 +43,25 @@
             <template v-slot:lead>
               Aquí podrás consultar información de distintas bolsas de valores y acciones en tiempo real.
             </template>
+            <b-row class="px-3">
+              <b-col class="rounded" cols="9">
+                <b-card title="Exchanges" border-variant="secondary">
+                  <b-card-text>
+                    A este lado podrás ver toda la información sobre los Mercados de Valores activos
+                  </b-card-text>
+                  <b-card-text>
+                    Navega en las pestañas para ver más información!
+                  </b-card-text>
+                </b-card>
+              </b-col>
+              <b-col class="rounded" cols="3">
+                <b-card title="Exchanges" border-variant="secondary">
+                  <b-card-text>
+                    A este lado podrás ver la información sobre las acciones.
+                  </b-card-text>
+                </b-card>
+              </b-col>
+            </b-row>
             <hr class="my-4">
             <p>Actualmente estás desconectado</p>
             <b-button v-b-modal.modal-1>Ayuda</b-button>
@@ -50,45 +69,52 @@
         </div>
       </div>
       <div v-else>
-        <b-row class="px-3">
-          <b-col class="rounded" cols="8">
+        <b-row class="px-1">
+          <b-col class="rounded" cols="9">
               <div v-for="(exch, index) in Exchanges" :key="index" class="px-2">
-                  <b-card class="full-width">
+                  <b-card border-variant="secondary">
                     <b-tabs card>
                       <b-tab title="Información" active>
-                        <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
-                        <a>{{exch.country}}, ({{exch.address}})</a>
-                        <!-- You will not be able to see this text. -->
-                        <line-chart :height="200" :chart-data="datacollection" id="mychart"></line-chart>
+                        <b-row>
+                          <b-col class="rounded" cols="9">
+                            <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
+                            <a>{{exch.country}}, ({{exch.address}})</a>
+                            <!-- You will not be able to see this text. -->
+                            <line-chart :height="200" :chart-data="datacollection" id="mychart"></line-chart>
+                          </b-col>
+                          <b-col class="rounded" cols="3">
+                            <h3>Indicadores</h3>
+                            <b-list-group>
+                              <b-list-group-item>
+                                <strong title="Cantidad de Acciones"> <b-icon icon="hash"></b-icon>Acciones: {{ exch.num_stocks() }} </strong>
+                              </b-list-group-item>
+                              <hr style="clear:both;"/>
+                              <b-list-group-item>
+                                <strong title="Volumen de Compra"> <b-icon icon="arrow-down"></b-icon>Compra: {{ exch.buy_vol() }} </strong>
+                              </b-list-group-item>
+                              <hr style="clear:both;"/>
+                              <b-list-group-item>
+                                <strong title="Volumen de Venta"> <b-icon icon="arrow-up"></b-icon>Venta: {{ exch.sell_vol() }} </strong>
+                              </b-list-group-item>
+                              <hr style="clear:both;"/>
+                              <b-list-group-item>
+                                <strong title="Volumen Total Transado"> <b-icon icon="arrow-up-down"></b-icon>Total: {{ exch.total_vol() }} </strong>
+                              </b-list-group-item>
+                            </b-list-group>
+                          </b-col>
+                        </b-row>
                       </b-tab>
                       <b-tab title="Gráfico Volumen">
-                        <h3>Indicadores</h3>
-                        <b-list-group>
-                          <b-list-group-item>
-                            <strong title="Cantidad de Acciones"> <b-icon icon="hash"></b-icon>Acciones: {{ exch.num_stocks() }} </strong>
-                          </b-list-group-item>
-                          <hr style="clear:both;"/>
-                          <b-list-group-item>
-                            <strong title="Volumen de Compra"> <b-icon icon="arrow-down"></b-icon>Compra: {{ exch.buy_vol() }} </strong>
-                          </b-list-group-item>
-                          <hr style="clear:both;"/>
-                          <b-list-group-item>
-                            <strong title="Volumen de Venta"> <b-icon icon="arrow-up"></b-icon>Venta: {{ exch.sell_vol() }} </strong>
-                          </b-list-group-item>
-                          <hr style="clear:both;"/>
-                          <b-list-group-item>
-                            <strong title="Volumen Total Transado"> <b-icon icon="arrow-up-down"></b-icon>Total: {{ exch.total_vol() }} </strong>
-                          </b-list-group-item>
-                        </b-list-group>
+                        <b-card-text>Proximamente</b-card-text>
                       </b-tab>
                     </b-tabs>
                   </b-card>
                 <hr style="clear:both;"/>
               </div>
           </b-col>
-          <b-col class="rounded" cols="4">
+          <b-col class="rounded" cols="3">
             <div v-for="(stock, index) in Stocks" :key="index">
-              <b-card body-class="text-center" header-tag="nav">
+              <b-card border-variant="secondary">
                 <b-tabs card>
                   <b-tab title="Info" active>
                     <b-card-text>
@@ -112,7 +138,7 @@
                           <strong title="Variación porcentual"><b-icon icon="exclamation-triangle"></b-icon> {{stock.var_percent}} </strong>
                           <hr style="clear:both;"/>
                           <div v-if="!stock.subscribed">
-                            <b-button size="sm" :pressed.sync="stock.subscribed" variant="outline-info">Subscribe</b-button>
+                            <b-button v-b-tooltip.hover title="Notificaciones de altos y bajos históricos" size="sm" :pressed.sync="stock.subscribed" variant="outline-info">Subscribe</b-button>
                           </div>
                           <div v-else>
                             <b-button size="sm" :pressed.sync="stock.subscribed" variant="outline-info">Unsubscribe</b-button>
@@ -122,14 +148,19 @@
                     </b-card-text>
                   </b-tab>
                   <b-tab title="Gráfico">
-                    <b-card-text>Tab contents 2</b-card-text>
+                    <b-card-text>Proximamente</b-card-text>
                   </b-tab>
                   <b-tab title="Transado">
-                    <b-card-text>Tab contents 2</b-card-text>
+                    <strong title="Volumen Compra"> Volumen Compra: {{stock.buy_vol}} </strong>
+                    <hr style="clear:both;"/>
+                    <strong title="Volumen Venta"> Volumen Venta: {{stock.sell_vol}} </strong>
+                    <hr style="clear:both;"/>
+                    <strong title="Volumen Total"> Volumen Total: {{stock.total_vol()}} </strong>
+                    <hr style="clear:both;"/>
                   </b-tab>
                 </b-tabs>
               </b-card>
-              <br>     
+              <hr style="clear:both;"/>
             </div>
           </b-col>
         </b-row>
@@ -201,7 +232,7 @@ export default {
     makeHighToast(ticker, value) {
       this.$bvToast.toast(`La acción llego a un nuevo alto histórico: ${value}`, {
         title: 'Alto Histórico de ' + ticker,
-        autoHideDelay: 3000,
+        autoHideDelay: 4000,
         variant: "success",
         appendToast: false
       })
@@ -210,7 +241,7 @@ export default {
     makeLowToast(ticker, value) {
       this.$bvToast.toast(`La acción llego a un nuevo bajo histórico: ${value}`, {
         title: 'Bajo Histórico de ' + ticker,
-        autoHideDelay: 3000,
+        autoHideDelay: 4000,
         variant: "danger",
         appendToast: false
       })
