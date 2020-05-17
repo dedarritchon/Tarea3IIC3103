@@ -51,7 +51,7 @@
       </div>
       <div v-else>
         <b-row class="px-3">
-          <b-col class="rounded" cols="9">
+          <b-col class="rounded" cols="8">
               <div v-for="(exch, index) in Exchanges" :key="index" class="px-2">
                   <b-card class="full-width">
                     <b-tabs card>
@@ -86,14 +86,14 @@
                 <hr style="clear:both;"/>
               </div>
           </b-col>
-          <b-col class="rounded" cols="3">
+          <b-col class="rounded" cols="4">
             <div v-for="(stock, index) in Stocks" :key="index">
               <b-card body-class="text-center" header-tag="nav">
                 <b-tabs card>
                   <b-tab title="Info" active>
                     <b-card-text>
                       <b-row class="px-3">
-                        <b-col class="rounded" cols="7">
+                        <b-col class="rounded" cols="6">
                           <b-avatar variant="primary" class="mr-3" size="4em">{{stock.ticker}}</b-avatar>
                           <h5>{{stock.company_name}}</h5>
                           <p title="País" ><b-icon icon="flag-fill"></b-icon>{{stock.country}} </p>
@@ -102,7 +102,7 @@
                           <hr style="clear:both;"/>
                           <strong title="Volumen Total Transado"><b-icon icon="arrow-up-down"></b-icon> {{stock.total_vol()}} </strong>
                         </b-col>
-                        <b-col class="rounded" cols="5">
+                        <b-col class="rounded" cols="6">
                           <strong title="Alto Histórico"> <b-icon icon="chevron-double-up"></b-icon> {{stock.all_time_high}} </strong>
                           <hr style="clear:both;"/>
                           <strong title="Bajo Histórico"><b-icon icon="chevron-double-down"></b-icon> {{stock.all_time_low}} </strong>
@@ -110,6 +110,13 @@
                           <strong title="Último precio"><b-icon icon="skip-backward"></b-icon> {{stock.last_price}} </strong>
                           <hr style="clear:both;"/>
                           <strong title="Variación porcentual"><b-icon icon="exclamation-triangle"></b-icon> {{stock.var_percent}} </strong>
+                          <hr style="clear:both;"/>
+                          <div v-if="!stock.subscribed">
+                            <b-button size="sm" :pressed.sync="stock.subscribed" variant="outline-info">Subscribe</b-button>
+                          </div>
+                          <div v-else>
+                            <b-button size="sm" :pressed.sync="stock.subscribed" variant="outline-info">Unsubscribe</b-button>
+                          </div>
                         </b-col>
                       </b-row> 
                     </b-card-text>
@@ -161,7 +168,6 @@ var stocks_values_dict = {};
 
 var stocks_datasets = [];
 
-
 function getRandomColor() {
   var letters = '0123456789ABCDEF';
   var color = '#';
@@ -192,27 +198,24 @@ export default {
   },
   methods: {
 
-    onClickHelp() {
-      this.$bvModal.msgBoxOk('User name: Fred Flintstone', {
-        title: "Hola",
-        size: 'sm',
-        buttonSize: 'sm',
-        okVariant: 'success',
-        headerClass: 'p-2 border-bottom-0',
-        footerClass: 'p-2 border-top-0'
+    makeHighToast(ticker, value) {
+      this.$bvToast.toast(`La acción llego a un nuevo alto histórico: ${value}`, {
+        title: 'Alto Histórico de ' + ticker,
+        autoHideDelay: 3000,
+        variant: "success",
+        appendToast: false
       })
     },
 
-    onClick() {
-      this.$bvModal.msgBoxOk('User name: Fred Flintstone', {
-        title: "Hola",
-        size: 'sm',
-        buttonSize: 'sm',
-        okVariant: 'success',
-        headerClass: 'p-2 border-bottom-0',
-        footerClass: 'p-2 border-top-0'
+    makeLowToast(ticker, value) {
+      this.$bvToast.toast(`La acción llego a un nuevo bajo histórico: ${value}`, {
+        title: 'Bajo Histórico de ' + ticker,
+        autoHideDelay: 3000,
+        variant: "danger",
+        appendToast: false
       })
     },
+
 
     fillData (lbls_array, stocks_datasets) {
       this.datacollection = {
@@ -282,6 +285,7 @@ export default {
       stock["all_time_low"] = 0;
       stock["last_price"] = 1;
       stock["var_percent"] = 0;
+      stock["subscribed"] = false;
 
       stock["total_vol"] = function() {
         var total_vol_sum = 0;
@@ -331,6 +335,9 @@ export default {
 
         if (data.value > this.Stocks[data.ticker]["all_time_high"]){
           this.Stocks[data.ticker]["all_time_high"] = data.value
+          if (this.Stocks[data.ticker]["subscribed"]){
+            this.makeHighToast(data.ticker, data.value)
+          }
         }
 
         if (this.Stocks[data.ticker]["all_time_low"] == 0){
@@ -339,6 +346,9 @@ export default {
 
         if (data.value < this.Stocks[data.ticker]["all_time_low"]){
           this.Stocks[data.ticker]["all_time_low"] = data.value
+          if (this.Stocks[data.ticker]["subscribed"]){
+            this.makeLowToast(data.ticker, data.value)
+          }
         }
 
         const last_price = this.Stocks[data.ticker]["last_price"]
