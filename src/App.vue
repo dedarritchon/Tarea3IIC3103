@@ -31,9 +31,7 @@
         </b-collapse>
       </b-navbar>
     </div>
-
     <br>
-
     <b-container fluid>
       <div v-if="Object.keys(Stocks).length == 0">
         <div>
@@ -43,9 +41,10 @@
             <template v-slot:lead>
               Aquí podrás consultar información de distintas bolsas de valores y acciones en tiempo real.
             </template>
-            <b-row class="px-3">
+            <hr class="my-4">
+            <b-row>
               <b-col class="rounded" cols="9">
-                <b-card title="Exchanges" border-variant="secondary">
+                <b-card title="Exchanges" border-variant="primary">
                   <b-card-text>
                     A este lado podrás ver toda la información sobre los Mercados de Valores activos
                   </b-card-text>
@@ -55,7 +54,7 @@
                 </b-card>
               </b-col>
               <b-col class="rounded" cols="3">
-                <b-card title="Exchanges" border-variant="secondary">
+                <b-card title="Stocks" border-variant="secondary">
                   <b-card-text>
                     A este lado podrás ver la información sobre las acciones.
                   </b-card-text>
@@ -71,48 +70,55 @@
       <div v-else>
         <b-row class="px-1">
           <b-col class="rounded" cols="9">
-              <div v-for="(exch, index) in Exchanges" :key="index" class="px-2">
-                  <b-card border-variant="secondary">
-                    <b-tabs card>
-                      <b-tab title="Información" active>
-                        <b-row>
-                          <b-col class="rounded" cols="9">
-                            <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
-                            <a>{{exch.country}}, ({{exch.address}})</a>
-                            <!-- You will not be able to see this text. -->
-                            <line-chart :height="200" :chart-data="datacollection" id="mychart"></line-chart>
-                          </b-col>
-                          <b-col class="rounded" cols="3">
-                            <h3>Indicadores</h3>
-                            <b-list-group>
-                              <b-list-group-item>
-                                <strong title="Cantidad de Acciones"> <b-icon icon="hash"></b-icon>Acciones: {{ exch.num_stocks() }} </strong>
-                              </b-list-group-item>
-                              <hr style="clear:both;"/>
-                              <b-list-group-item>
-                                <strong title="Volumen de Compra"> <b-icon icon="arrow-down"></b-icon>Compra: {{ exch.buy_vol() }} </strong>
-                              </b-list-group-item>
-                              <hr style="clear:both;"/>
-                              <b-list-group-item>
-                                <strong title="Volumen de Venta"> <b-icon icon="arrow-up"></b-icon>Venta: {{ exch.sell_vol() }} </strong>
-                              </b-list-group-item>
-                              <hr style="clear:both;"/>
-                              <b-list-group-item>
-                                <strong title="Volumen Total Transado"> <b-icon icon="arrow-up-down"></b-icon>Total: {{ exch.total_vol() }} </strong>
-                              </b-list-group-item>
-                            </b-list-group>
-                          </b-col>
-                        </b-row>
-                      </b-tab>
-                      <b-tab title="Gráfico Volumen">
-                        <b-card-text>Proximamente</b-card-text>
-                      </b-tab>
-                    </b-tabs>
-                  </b-card>
-                <hr style="clear:both;"/>
-              </div>
+            <h2>{{ Object.keys(Exchanges).length }} Exchanges activos:</h2>
+            <div v-for="(exch, index) in Exchanges" :key="index">
+              <b-card border-variant="primary">
+                <b-tabs card>
+                  <b-tab title="Información" active>
+                    <b-row>
+                      <b-col class="rounded" cols="9">
+                        <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
+                        <a>{{exch.country}}, ({{exch.address}})</a>
+                        <!-- You will not be able to see this text. -->
+                        <line-chart :height="200" :chart-data="datacollection" id="mychart"></line-chart>
+                      </b-col>
+                      <b-col class="rounded" cols="3">
+                        <h3>Indicadores</h3>
+                        <b-list-group>
+                          <b-list-group-item>
+                            <strong title="Cantidad de Acciones"> <b-icon icon="hash"></b-icon>Acciones: {{ exch.num_stocks() }} </strong>
+                          </b-list-group-item>
+                          <hr style="clear:both;"/>
+                          <b-list-group-item>
+                            <strong title="Volumen de Compra"> <b-icon icon="arrow-down"></b-icon>Compra: {{ exch.buy_vol() }} </strong>
+                          </b-list-group-item>
+                          <hr style="clear:both;"/>
+                          <b-list-group-item>
+                            <strong title="Volumen de Venta"> <b-icon icon="arrow-up"></b-icon>Venta: {{ exch.sell_vol() }} </strong>
+                          </b-list-group-item>
+                          <hr style="clear:both;"/>
+                          <b-list-group-item>
+                            <strong title="Volumen Total Transado"> <b-icon icon="arrow-up-down"></b-icon>Total: {{ exch.total_vol() }} </strong>
+                          </b-list-group-item>
+                          <hr style="clear:both;"/>
+                          <b-list-group-item>
+                            <strong title="MarketShare"> <b-icon icon="pie-chart-fill"></b-icon> MarketShare: {{ exch.marketshare() }} </strong>
+                          </b-list-group-item>
+                        </b-list-group>
+                      </b-col>
+                    </b-row>
+                  </b-tab>
+                  <b-tab title="Gráfico Volumen">
+                    <b-card-text>No me alcanzó el tiempo :(</b-card-text>
+                  </b-tab>
+                </b-tabs>
+              </b-card>
+            <hr style="clear:both;"/>
+            </div>
           </b-col>
+          
           <b-col class="rounded" cols="3">
+            <h2>{{ Object.keys(Stocks).length }} Stocks activos:</h2>
             <div v-for="(stock, index) in Stocks" :key="index">
               <b-card border-variant="secondary">
                 <b-tabs card>
@@ -148,7 +154,8 @@
                     </b-card-text>
                   </b-tab>
                   <b-tab title="Gráfico">
-                    <b-card-text>Proximamente</b-card-text>
+                    <line-chart :height="200" :chart-data="StocksData[stock.ticker]" id="mychart2"></line-chart>
+                    Me tiraba muchos errores :(, pero puedes apretar los labels del gráfico de Exchanges para activar/desactivar cada acción :)
                   </b-tab>
                   <b-tab title="Transado">
                     <strong title="Volumen Compra"> Volumen Compra: {{stock.buy_vol}} </strong>
@@ -187,14 +194,11 @@
 
 <script>
 import LineChart from "./LineChart.js";
-
-
 import io from 'socket.io-client';
 
 var socket = io('wss://le-18262636.bitzonte.com', {path: '/stocks'});  
 
 var lbls_array = [];
-
 var stocks_values_dict = {};
 
 var stocks_datasets = [];
@@ -215,18 +219,20 @@ export default {
   },
   data(){
     return {
-      fecha_hora_actual: "Desconectado",
+      fecha_hora_actual: "Estás desconectado",
       datacollection: {},
       stocks_info: [],
-      exchange_info: [],
       myToggle: false,
       Action: "Start",
       ButtonStyle: "outline-primary",
       //Variables Para el cambio de estructura
       Stocks: {},
       Exchanges: {},
+      StocksData: {},
+      ExchangesData: {},
     };
   },
+
   methods: {
 
     makeHighToast(ticker, value) {
@@ -247,57 +253,58 @@ export default {
       })
     },
 
-
-    fillData (lbls_array, stocks_datasets) {
-      this.datacollection = {
-        labels: lbls_array,
-        datasets: stocks_datasets
-      }
-    },
-
     GetExchangeInfo() {
       socket.emit('EXCHANGES', /* */);
       socket.once("EXCHANGES", (data)=>{
         this.exchange_info = data;
         for (var key in data) {
-          this.CreateExchangeObject(data[key])
+          this.CreateExchangeObjects(data[key])
         }
       })
     },
 
-    CreateExchangeObject(exch){
-      //var stocks = [];
+    CreateExchangeObjects(exch){
       exch["stocks"] = {}
       for (var key in this.Stocks) {
         if (exch.listed_companies.includes(this.Stocks[key]["company_name"])){
           exch["stocks"][this.Stocks[key]["ticker"]] = this.Stocks[key]
         }
       }
-      exch["buy_vol"] = function() {  // Method which will display type of Animal
+      exch["buy_vol"] = function() {
         var buy_vol_sum = 0;
         for (var key in exch["stocks"]) {
           buy_vol_sum += exch["stocks"][key]["buy_vol"]
         }
         return buy_vol_sum
       }
-      exch["sell_vol"] = function() {  // Method which will display type of Animal
+      exch["sell_vol"] = function() {
         var sell_vol_sum = 0;
         for (var key in exch["stocks"]) {
           sell_vol_sum += exch["stocks"][key]["sell_vol"]
         }
         return sell_vol_sum
       }
-      exch["total_vol"] = function() {  // Method which will display type of Animal
+      exch["total_vol"] = function() {
         var total_vol_sum = 0;
         for (var key in exch["stocks"]) {
           total_vol_sum += exch["stocks"][key].total_vol()
         }
         return total_vol_sum
       }
-      exch["num_stocks"] = function() {  // Method which will display type of Animal
+      exch["num_stocks"] = function() {
         return Object.keys(exch["stocks"]).length
       }
-
+      var self = this;
+      exch["marketshare"] = function() {
+        console.log("Calculando marketshare");
+        var total_vol = 0
+        for (key in self.Exchanges){
+          console.log(key)
+          total_vol += self.Exchanges[key].total_vol()
+        }
+        return (exch.total_vol()/total_vol).toFixed(2) + '%'
+      }
+      
       this.Exchanges[exch["exchange_ticker"]] = exch;
     },
 
@@ -305,31 +312,46 @@ export default {
       socket.emit('STOCKS', /* */);
       socket.once("STOCKS", (data)=>{
         this.stocks_info = data;
-        data.forEach(this.CreateStockObject)
+        data.forEach(this.CreateStockObjects)
       })
     },
 
-    CreateStockObject(stock){
+    CreateStockObjects(stock){
+      //creo Objeto stock y lo guardo en Stocks
       stock["buy_vol"] = 0;
       stock["sell_vol"] = 0;
       stock["all_time_high"] = 0;
       stock["all_time_low"] = 0;
-      stock["last_price"] = 1;
-      stock["var_percent"] = 0;
+      stock["last_price"] = "-";
+      stock["var_percent"] = "-";
       stock["subscribed"] = false;
-
       stock["total_vol"] = function() {
         var total_vol_sum = 0;
           total_vol_sum += stock["buy_vol"]
           total_vol_sum += stock["sell_vol"]
         return total_vol_sum
       }
-
       this.Stocks[stock["ticker"]] = stock;
+
+      //creo datacollection de stock y lo guardo en StockData
+      var stock_data = {};
+      stock_data["labels"] = [];
+      stock_data["datasets"] = [];
+
+      //información para los gráficos
+      var color = getRandomColor();
+      var dataset = {};
+      dataset["label"] = stock.ticker;
+      dataset["data"] = [];
+      dataset["backgroundColor"] = color;
+      dataset["borderColor"] = color;
+      dataset["fill"] = false;
+      stock_data["datasets"].push(dataset)
+      this.StocksData[stock.ticker] = stock_data;
+      this.$set(this.StocksData, stock.ticker, stock_data)
     },
 
     SocketBuy(data){
-      //this.fillData(fetchedData)
       console.log("Buy:\t", data);
       if (data.ticker in this.Stocks){
         this.Stocks[data.ticker]["buy_vol"] += data.volume
@@ -337,7 +359,6 @@ export default {
     },
 
     SocketSell(data){
-      //this.fillData(fetchedData)
       console.log("Sell:\t", data);
       if (data.ticker in this.Stocks){
         this.Stocks[data.ticker]["sell_vol"] += data.volume
@@ -345,12 +366,12 @@ export default {
     },
 
     SocketUpdate(data){
-      //this.fillData(fetchedData)
       console.log("Update:\t", data);
       this.fecha_hora_actual = new Date(data.time).toLocaleString("es-CL")
+
+      //Manejo de fechas (Todos los gráficos tendrán las mismas fechas)
       var date = new Date(data.time).toLocaleTimeString("es-CL")
       //reviso si deberia agregarlo a la lista o ya está:
-
       if(!lbls_array.length){
         //empty
           lbls_array.push(date)
@@ -360,32 +381,29 @@ export default {
           lbls_array.push(date)
         }
       }
-
       //Nueva version
       if (data.ticker in this.Stocks){
-
+        //Indicadores Stock
         if (data.value > this.Stocks[data.ticker]["all_time_high"]){
           this.Stocks[data.ticker]["all_time_high"] = data.value
           if (this.Stocks[data.ticker]["subscribed"]){
             this.makeHighToast(data.ticker, data.value)
           }
         }
-
         if (this.Stocks[data.ticker]["all_time_low"] == 0){
           this.Stocks[data.ticker]["all_time_low"] = data.value
         }
-
         if (data.value < this.Stocks[data.ticker]["all_time_low"]){
           this.Stocks[data.ticker]["all_time_low"] = data.value
           if (this.Stocks[data.ticker]["subscribed"]){
             this.makeLowToast(data.ticker, data.value)
           }
         }
-
         const last_price = this.Stocks[data.ticker]["last_price"]
-        this.Stocks[data.ticker]["var_percent"] = ((100 * (last_price - data.value))/last_price).toFixed(2) + '%'
+        if (last_price != "-"){
+          this.Stocks[data.ticker]["var_percent"] = ((100 * (last_price - data.value))/last_price).toFixed(2) + '%'
+        }
         this.Stocks[data.ticker]["last_price"] = data.value;
-        
       }
 
       if (!(data.ticker in stocks_values_dict)){
@@ -411,7 +429,10 @@ export default {
         stocks_values_dict[data.ticker].push(data.value);
       }
 
-      this.fillData(lbls_array, stocks_datasets);
+      this.datacollection = {
+        labels: lbls_array,
+        datasets: stocks_datasets
+      }
     },
 
     StartRealtimeData(){
@@ -427,25 +448,19 @@ export default {
     },
 
     ToggleRealtimeData() {  
-
       if (this.Action == "Start"){
-        //Variables Setup
         this.Action = "Stop"
         this.ButtonStyle = "danger"
-
         //Recibir Info de stocks y crear objetos
         this.GetStockInfo();
-
         //Recibo Info de Exchanges y crear objetos (Con referencias a las Stocks)
         this.GetExchangeInfo();
-        
-        //Socket Comienza a escuchar eventos update, buy
+        //Socket Comienza a escuchar eventos update, buy y sell
         this.StartRealtimeData();
       }
       else{
         this.Action = "Start"
         this.ButtonStyle = "outline-primary"
-
         this.StopRealtimeData()
       }
     },
@@ -462,11 +477,12 @@ export default {
     },
 
     TotalRefresh() {
-      this.exchange_info = [];
       this.stocks_info = [];
-      this.Stocks = {}
-      this.Exchanges = {}
-      this.fecha_hora_actual =  "Desconectado"
+      this.Stocks = {};
+      this.Exchanges = {};
+      this.StocksData = {};
+      this.ExchangesData = {};
+      this.fecha_hora_actual =  "Estás desconectado";
     },
 
     Refresh() {
@@ -479,12 +495,13 @@ export default {
       lbls_array = [];
       stocks_datasets = [];
       stocks_values_dict = {};
-      this.fillData(lbls_array, stocks_datasets);
-    },
 
-    getRandomInt () {
-      return Math.floor(Math.random() * (50 - 5 + 1)) + 5
-    },
+      this.datacollection = {
+        labels: lbls_array,
+        datasets: stocks_datasets
+      }
+      
+    }
   }
 };
 </script>
