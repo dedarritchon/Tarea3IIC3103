@@ -51,69 +51,76 @@
       </div>
       <div v-else>
         <b-row class="px-3">
-          <b-col class="border border-dark" cols="9">
-            <h2>Exchanges:</h2>   
+          <b-col class="rounded" cols="9">
               <div v-for="(exch, index) in Exchanges" :key="index" class="px-2">
-                <b-row>
-                <b-col class="border border-dark" cols="9">
-                  <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
-                  <a>{{exch.country}}, ({{exch.address}})</a>
-                  <!-- You will not be able to see this text. -->
-                  <line-chart :height="200" :chart-data="datacollection" id="mychart"></line-chart>
-                  <br>
-                </b-col>
-                <b-col class="border border-dark" cols="3">
-                  <h3>Indicadores</h3>
-                  <b-list-group>
-                    <b-list-group-item>
-                      <strong title="Cantidad de Acciones"> <b-icon icon="hash"></b-icon>Acciones: {{ exch.num_stocks() }} </strong>
-                    </b-list-group-item>
-                    <hr style="clear:both;"/>
-                    <b-list-group-item>
-                      <strong title="Volumen de Compra"> <b-icon icon="arrow-down"></b-icon>Compra: {{ exch.buy_vol() }} </strong>
-                    </b-list-group-item>
-                    <hr style="clear:both;"/>
-                    <b-list-group-item>
-                      <strong title="Volumen de Venta"> <b-icon icon="arrow-up"></b-icon>Venta: {{ exch.sell_vol() }} </strong>
-                    </b-list-group-item>
-                    <hr style="clear:both;"/>
-                    <b-list-group-item>
-                      <strong title="Volumen Total Transado"> <b-icon icon="arrow-up-down"></b-icon>Total: {{ exch.total_vol() }} </strong>
-                    </b-list-group-item>
-                  </b-list-group>
-                </b-col>
-                </b-row>
+                  <b-card class="full-width">
+                    <b-tabs card>
+                      <b-tab title="Información" active>
+                        <h3>{{exch.name}} ({{exch.exchange_ticker}})</h3>
+                        <a>{{exch.country}}, ({{exch.address}})</a>
+                        <!-- You will not be able to see this text. -->
+                        <line-chart :height="200" :chart-data="datacollection" id="mychart"></line-chart>
+                      </b-tab>
+                      <b-tab title="Gráfico Volumen">
+                        <h3>Indicadores</h3>
+                        <b-list-group>
+                          <b-list-group-item>
+                            <strong title="Cantidad de Acciones"> <b-icon icon="hash"></b-icon>Acciones: {{ exch.num_stocks() }} </strong>
+                          </b-list-group-item>
+                          <hr style="clear:both;"/>
+                          <b-list-group-item>
+                            <strong title="Volumen de Compra"> <b-icon icon="arrow-down"></b-icon>Compra: {{ exch.buy_vol() }} </strong>
+                          </b-list-group-item>
+                          <hr style="clear:both;"/>
+                          <b-list-group-item>
+                            <strong title="Volumen de Venta"> <b-icon icon="arrow-up"></b-icon>Venta: {{ exch.sell_vol() }} </strong>
+                          </b-list-group-item>
+                          <hr style="clear:both;"/>
+                          <b-list-group-item>
+                            <strong title="Volumen Total Transado"> <b-icon icon="arrow-up-down"></b-icon>Total: {{ exch.total_vol() }} </strong>
+                          </b-list-group-item>
+                        </b-list-group>
+                      </b-tab>
+                    </b-tabs>
+                  </b-card>
                 <hr style="clear:both;"/>
               </div>
           </b-col>
-          <b-col class="border border-dark">
-            <h2>Stocks:</h2>
+          <b-col class="rounded" cols="3">
             <div v-for="(stock, index) in Stocks" :key="index">
-                <b-card body-class="text-center" header-tag="nav">
-
-                <b-card-text>
-                  <b-row class="px-3">
-                    <b-col class="rounded" cols="7">
-                      <b-avatar variant="primary" class="mr-3" size="4em">{{stock.ticker}}</b-avatar>
-                      <h5>{{stock.company_name}}</h5>
-                      <p title="País" ><b-icon icon="flag-fill"></b-icon>{{stock.country}} </p>
-                      <hr style="clear:both;"/>
-                      <strong title="Moneda"> <b-icon icon="wallet"></b-icon> {{stock.quote_base}} </strong>
-                      <hr style="clear:both;"/>
-                      <strong title="Volumen Total Transado"><b-icon icon="arrow-up-down"></b-icon> {{stock.total_vol()}} </strong>
-                    </b-col>
-                    <b-col class="rounded" cols="5">
-                      <strong title="Alto Histórico"> <b-icon icon="chevron-double-up"></b-icon> {{stock.all_time_high}} </strong>
-                      <hr style="clear:both;"/>
-                      <strong title="Bajo Histórico"><b-icon icon="chevron-double-down"></b-icon> {{stock.all_time_low}} </strong>
-                      <hr style="clear:both;"/>
-                      <strong title="Último precio"><b-icon icon="skip-backward"></b-icon> {{stock.last_price}} </strong>
-                      <hr style="clear:both;"/>
-                      <strong title="Variación porcentual"><b-icon icon="exclamation-triangle"></b-icon> {{stock.var_percent}} </strong>
-                    </b-col>
-                  </b-row> 
-                </b-card-text>
-
+              <b-card body-class="text-center" header-tag="nav">
+                <b-tabs card>
+                  <b-tab title="Info" active>
+                    <b-card-text>
+                      <b-row class="px-3">
+                        <b-col class="rounded" cols="7">
+                          <b-avatar variant="primary" class="mr-3" size="4em">{{stock.ticker}}</b-avatar>
+                          <h5>{{stock.company_name}}</h5>
+                          <p title="País" ><b-icon icon="flag-fill"></b-icon>{{stock.country}} </p>
+                          <hr style="clear:both;"/>
+                          <strong title="Moneda"> <b-icon icon="wallet"></b-icon> {{stock.quote_base}} </strong>
+                          <hr style="clear:both;"/>
+                          <strong title="Volumen Total Transado"><b-icon icon="arrow-up-down"></b-icon> {{stock.total_vol()}} </strong>
+                        </b-col>
+                        <b-col class="rounded" cols="5">
+                          <strong title="Alto Histórico"> <b-icon icon="chevron-double-up"></b-icon> {{stock.all_time_high}} </strong>
+                          <hr style="clear:both;"/>
+                          <strong title="Bajo Histórico"><b-icon icon="chevron-double-down"></b-icon> {{stock.all_time_low}} </strong>
+                          <hr style="clear:both;"/>
+                          <strong title="Último precio"><b-icon icon="skip-backward"></b-icon> {{stock.last_price}} </strong>
+                          <hr style="clear:both;"/>
+                          <strong title="Variación porcentual"><b-icon icon="exclamation-triangle"></b-icon> {{stock.var_percent}} </strong>
+                        </b-col>
+                      </b-row> 
+                    </b-card-text>
+                  </b-tab>
+                  <b-tab title="Gráfico">
+                    <b-card-text>Tab contents 2</b-card-text>
+                  </b-tab>
+                  <b-tab title="Transado">
+                    <b-card-text>Tab contents 2</b-card-text>
+                  </b-tab>
+                </b-tabs>
               </b-card>
               <br>     
             </div>
