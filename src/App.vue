@@ -175,7 +175,12 @@
     </b-container>
 
     <!-- Footer -->
-
+    <footer>
+    <div class="footer-copyright text-center py-3">
+      Tarea 3 - IIC3103 - made with ❤️ by Daniel Darritchon 2020
+    - <a href="https://github.com/dedarritchon/Tarea3IIC3103">Github</a>
+    </div>
+    </footer>
     <!-- Footer -->
 
     <b-modal id="modal-1" title="IIC3103 Exchange">
