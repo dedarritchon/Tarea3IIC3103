@@ -109,7 +109,15 @@
                     </b-row>
                   </b-tab>
                   <b-tab title="Gráfico Volumen">
-                    <b-card-text>No me alcanzó el tiempo :(</b-card-text>
+                    <b-card-text>
+                      Esto era un objetivo extra...
+                      <br>
+                      Sobre el gráfico de las acciones, solo me funcionó bien mostrando todas, por culpa de este
+                      <a href="https://github.com/chartjs/Chart.js/issues/3753">error</a>
+                      <br>
+                      <strong>Protip:</strong>
+                      puedes apretar los labels del gráfico para activar/desactivar cada acción :)
+                    </b-card-text>
                   </b-tab>
                 </b-tabs>
               </b-card>
@@ -154,8 +162,11 @@
                     </b-card-text>
                   </b-tab>
                   <b-tab title="Gráfico">
-                    <line-chart :height="200" :chart-data="StocksData[stock.ticker]" id="mychart2"></line-chart>
-                    Me tiraba muchos errores :(, pero puedes apretar los labels del gráfico de Exchanges para activar/desactivar cada acción :)
+                    Me tiraba muchos
+                      <a href="https://github.com/chartjs/Chart.js/issues/3753">errores</a>
+                    que al parecer no han arreglado :(
+                    <strong>Protip:</strong>
+                    puedes apretar los labels del gráfico de Exchanges para activar/desactivar cada acción :)
                   </b-tab>
                   <b-tab title="Transado">
                     <strong title="Volumen Compra"> Volumen Compra: {{stock.buy_vol}} </strong>
@@ -185,9 +196,19 @@
 
     <b-modal id="modal-1" title="IIC3103 Exchange">
       <p class="my-4">
-        Hola! Para conectarte, pulsa el botón Start. <br>
-        Una vez conectado, puedes actualizar la información con el botón Refresh.
-        </p> 
+        Hola! Para conectarte, pulsa el botón
+        <b-button disabled variant="primary"> <b-icon icon="power"></b-icon> Start</b-button>
+        <br>
+        <i>Hint: está arriba a la izquierda</i>
+        <br>
+        <br>
+        Puedes actualizar la información con el botón
+        <b-button disabled> <b-icon icon="arrow-clockwise"></b-icon> Refresh</b-button>
+        <br>
+        <br>
+        Para desconectarte, pulsa el botón
+        <b-button disabled variant="danger"> <b-icon icon="power"></b-icon> Stop</b-button>
+      </p> 
     </b-modal>
 
     <b-modal id="modal-2" title="IIC3103 Exchange">
@@ -233,8 +254,6 @@ export default {
       //Variables Para el cambio de estructura
       Stocks: {},
       Exchanges: {},
-      StocksData: {},
-      ExchangesData: {},
     };
   },
 
@@ -301,10 +320,8 @@ export default {
       }
       var self = this;
       exch["marketshare"] = function() {
-        console.log("Calculando marketshare");
         var total_vol = 0
         for (key in self.Exchanges){
-          console.log(key)
           total_vol += self.Exchanges[key].total_vol()
         }
         return (exch.total_vol()/total_vol).toFixed(2) + '%'
@@ -337,23 +354,6 @@ export default {
         return total_vol_sum
       }
       this.Stocks[stock["ticker"]] = stock;
-
-      //creo datacollection de stock y lo guardo en StockData
-      var stock_data = {};
-      stock_data["labels"] = [];
-      stock_data["datasets"] = [];
-
-      //información para los gráficos
-      var color = getRandomColor();
-      var dataset = {};
-      dataset["label"] = stock.ticker;
-      dataset["data"] = [];
-      dataset["backgroundColor"] = color;
-      dataset["borderColor"] = color;
-      dataset["fill"] = false;
-      stock_data["datasets"].push(dataset)
-      this.StocksData[stock.ticker] = stock_data;
-      this.$set(this.StocksData, stock.ticker, stock_data)
     },
 
     SocketBuy(data){
@@ -486,7 +486,6 @@ export default {
       this.Stocks = {};
       this.Exchanges = {};
       this.StocksData = {};
-      this.ExchangesData = {};
       this.fecha_hora_actual =  "Estás desconectado";
     },
 
