@@ -1,0 +1,1 @@
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,Helvetica,sans-serif;line-height:1.4}.small{max-width:400px;margin:150px auto}.chartWrapper{position:relative}.chartWrapper>canvas{position:absolute;left:0;top:0;pointer-events:none}.chartAreaWrapper{width:600px;overflow-x:scroll}
